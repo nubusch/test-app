@@ -6,15 +6,6 @@ library(sendmailR)
 library(data.table)
 
 
-id <- "15mfq838c4f9X-WC8n8mwXBtugOlzeVpf" 
-films <- read.csv(paste0("https://docs.google.com/uc?id=",id,"&export=download"))
-
-films <- films[-c(1,26)]
-films <- films[-c(1:3),]
-
-
-names(films) <- c( "name", "FilmorSerie", "Comedy", "Drama", "Family", "Fantasy", "Action", "Crime","Western","Romance","Adventure","Mystery",
-                   "Scifi","Animation","Music","Thriller","Musical","Horror","History","War","Biography","Sport","Short","Documentary")
 
 
 
@@ -23,46 +14,111 @@ names(films) <- c( "name", "FilmorSerie", "Comedy", "Drama", "Family", "Fantasy"
 
 
 
-ui <- fluidPage(
-  theme = bs_theme(bootswatch=  "darkly"    ), 
-  
-  
-  
-  
-  
-  
-  titlePanel("nub's advice for movies and series"),
-  sidebarLayout(
-    sidebarPanel("Still in progress..."),
-    fluidRow(column(3,
-                    
-                    checkboxGroupInput( inputId = "Filmsorseries",
-                                        label = "Films or Series",
-                                        choices = c("Films" = "F", "Series" = "S"))),
-             
-             
-             column(3, offset = 2,
-                    
-                    checkboxGroupInput(inputId = "genre",
-                                       label = "Select Genres",
-                                       choices = sort(c("Animation", "Action", "Adventure", "Comedy", "Crime", "Drama", "Family", "Fantasy", "Romance", "Mystery", "Scifi",  "Music", "Thriller", "Musical", "Horror", "History", "War", "Biography", "Sport", "Short", "Documentary", "Western"  )))),
-             
-             
-             column(6,
-                    
-                    textInput("text", label = h5("Please leave your feedback here - nub"), value = "Enter text..."),
-                    actionButton("fbButton", "Submit"),
-                    
-                    
-             ),
-             
-             
-             
-             
-             
-             mainPanel(verbatimTextOutput("value")),
-             
-    )))
+
+
+
+
+
+ui <- navbarPage("Nubs advice for movies and serie", fluid = TRUE, theme = bs_theme(bootswatch =  "darkly"),
+                 
+                 tabPanel("My choice",
+                          titlePanel("My choice for what to watch"),
+                          fluidRow(column(3,
+                                          
+                                          checkboxGroupInput( inputId = "Filmsorseries",
+                                                              label = "Films or Series",
+                                                              choices = c("Films" = "F", "Series" = "S"))),
+                                   
+                                   
+                                   checkboxGroupInput(inputId = "genre",
+                                                      label = "Select Genres",
+                                                      choices = sort(c("Animation", "Action", "Adventure", "Comedy", "Crime", "Drama", "Family", "Fantasy", "Romance", "Mystery", "Scifi",  "Music", "Thriller", "Musical", "Horror", "History", "War", "Biography", "Sport", "Short", "Documentary", "Western"  ))),
+                                   
+                                   
+                                   column(6,
+                                          
+                                          
+                                          
+                                          
+                                          mainPanel(dataTableOutput("choice"))
+                                          
+                                          
+                                          
+                                   ))
+                          
+                          
+                          
+                          
+                          
+                 ),
+                 
+                 
+                 
+                 
+                 
+                 
+                 tabPanel("About",
+                          titlePanel("About me and the project"),
+                          fluidRow(column(6,
+                                          h4(p("About the Project")),
+                                          h5(p("This project is intended to facilitate useful comparisons between colleges in the NCAA, based on swimming performance, location, and academic information.  Here a prospective student-athlete, or anyone else with an interest can find schools fitting a particular set of criterion relevant to them, for example, schools close to home, with times in a particular range, and of a specified academic profile.")),
+                                          br(),
+                                          h5(p("The project began as an attempt to combine my interest in swimming with a need to practice R, a programming language used primarily for analyzing and reporting data.  It has two components.  The first is this app, which queries a dataset to return information in the form of plots, data tables etc.  The second is the dataset itself, which I assembled by tying together information from the sources below.")),
+                                          br(),
+                                          h5(p("I hope you find it interesting and/or useful.  Any comments or questions are welcome at gpilgrim2607@gmail.com"),
+                                             p("The source code for this Shiny app is available ", a("on github", href = "https://github.com/gpilgrim2670/SwimMap"), "."))
+                                          
+                                          
+                                          
+                                          
+                          )
+                          
+                          
+                          
+                          )
+                          
+                          
+                          
+                 ),
+                 
+                 
+                 tabPanel("Feedback",
+                          titlePanel("In case of feedback"),
+                          fluidRow(column(6,
+                                          h4(p("About the Project")),
+                                          h5(p("This project is intended to facilitate useful comparisons between colleges in the NCAA, based on swimming performance, location, and academic information.  Here a prospective student-athlete, or anyone else with an interest can find schools fitting a particular set of criterion relevant to them, for example, schools close to home, with times in a particular range, and of a specified academic profile.")),
+                                          br(),
+                                          h5(p("The project began as an attempt to combine my interest in swimming with a need to practice R, a programming language used primarily for analyzing and reporting data.  It has two components.  The first is this app, which queries a dataset to return information in the form of plots, data tables etc.  The second is the dataset itself, which I assembled by tying together information from the sources below.")),
+                                          br(),
+                                          h5(p("I hope you find it interesting and/or useful.  Any comments or questions are welcome at gpilgrim2607@gmail.com"),
+                                             p("The source code for this Shiny app is available ", a("on github", href = "https://github.com/gpilgrim2670/SwimMap"), "."))
+                                          
+                          ),
+                          
+                          column(6,
+                                 textInput("text", label = h5("Please leave your feedback here - nub"), value = "Enter text..."),
+                                 actionButton("fbButton", "Submit")
+                                 
+                          )
+                          
+                          
+                          
+                          
+                          
+                          
+                          )
+                          
+                          
+                          
+                          
+                          
+                          
+                 )
+                 
+                 
+                 
+                 
+)
 
 
 
@@ -72,18 +128,23 @@ ui <- fluidPage(
 
 server <- function(input, output) {
   
+  id <- "15mfq838c4f9X-WC8n8mwXBtugOlzeVpf" 
+  films <- read.csv(paste0("https://docs.google.com/uc?id=",id,"&export=download"))
   
-  fbtext <- eventReactive(input$fbButton, {
-    input$text
-  })
+  films <- films[-c(1,26)]
+  films <- films[-c(1:3),]
   
-  output$nText <- renderText({
-    fbtext()
-  })
   
-  output$value <- renderText({ input$genre })
+  names(films) <- c( "name", "FilmorSerie", "Comedy", "Drama", "Family", "Fantasy", "Action", "Crime","Western","Romance","Adventure","Mystery",
+                     "Scifi","Animation","Music","Thriller","Musical","Horror","History","War","Biography","Sport","Short","Documentary")
   
-  #define variables
+  
+  
+    #define variables
+  
+  
+  
+  
   
   
   
@@ -112,9 +173,12 @@ server <- function(input, output) {
   
   
   
+  #create outputs
   
-  
-  
+  output$choice <- renderDataTable({
+    data.table(films[, input$genre,drop = FALSE])
+    
+  })
   
   
   
